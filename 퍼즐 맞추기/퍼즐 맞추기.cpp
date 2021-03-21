@@ -1,6 +1,5 @@
 #include <bangtal.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 
 int piecex[16], piecey[16], gameflag = 0;
@@ -35,8 +34,8 @@ ObjectID piece14 = createObject("image//14.png");
 ObjectID piece15 = createObject("image//15.png");
 ObjectID pieceempty = createObject("image//empty.png");
 
-ObjectID temptimer = createTimer(1.0f);
-ObjectID resulttimer = createTimer(1);
+TimerID temptimer = createTimer(1.0f);
+TimerID resulttimer = createTimer(1);
 
 void swap(int* a, int* b)
 {
@@ -61,8 +60,8 @@ bool piececheck()
 void gameend()
 {
 	gameflag = 0;
-	showObject(start);
 	showObject(end);
+	showObject(start);
 	stopTimer(temptimer);
 	setTimer(resulttimer, secondcount);
 	showTimer(resulttimer);
@@ -283,12 +282,13 @@ void shuffle()
 void game()
 {
 	gameflag = 1;
-	shuffle();
-	puzzlelocate();
-	hideObject(start);
-	hideObject(end);
 	secondcount = 0;
+
+	shuffle();
 	hideTimer();
+	puzzlelocate();
+	hideObject(end);
+	hideObject(start);
 	startTimer(temptimer);
 }
 
@@ -315,15 +315,20 @@ void timercallback(TimerID timer)
 {
 	if (timer == temptimer)
 	{
+		secondcount++;
+
 		stopTimer(temptimer);
 		setTimer(temptimer, 1.0f);
 		startTimer(temptimer);
-		secondcount++;
 	}
 }
+
 int main(void)
 {
 	srand(time(NULL));
+
+	setMouseCallback(mousecallback);
+	setTimerCallback(timercallback);
 
 	setGameOption(GameOption::GAME_OPTION_ROOM_TITLE, false);
 	setGameOption(GameOption::GAME_OPTION_INVENTORY_BUTTON, false);
@@ -335,13 +340,9 @@ int main(void)
 		pieces[i].y = i / 4;
 	}
 
-	setMouseCallback(mousecallback);
-	setTimerCallback(timercallback);
-
+	puzzlelocate();
 	locateObject(end, mainScene, 1000, 150); 
 	locateObject(start, mainScene, 1000, 250); 
-
-	puzzlelocate();
 
 	showObject(end);
 	showObject(start);
