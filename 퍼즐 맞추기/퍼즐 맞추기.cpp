@@ -4,6 +4,7 @@
 #include <time.h>
 
 int piecex[16], piecey[16], gameflag = 0;
+Second secondcount;
 
 typedef struct
 {
@@ -34,6 +35,9 @@ ObjectID piece14 = createObject("image//14.png");
 ObjectID piece15 = createObject("image//15.png");
 ObjectID pieceempty = createObject("image//empty.png");
 
+ObjectID temptimer = createTimer(1.0f);
+ObjectID resulttimer = createTimer(1);
+
 void swap(int* a, int* b)
 {
 	int t = *a;
@@ -59,6 +63,9 @@ void gameend()
 	gameflag = 0;
 	showObject(start);
 	showObject(end);
+	stopTimer(temptimer);
+	setTimer(resulttimer, secondcount);
+	showTimer(resulttimer);
 }
 
 void puzzlelocate()
@@ -280,6 +287,9 @@ void game()
 	puzzlelocate();
 	hideObject(start);
 	hideObject(end);
+	secondcount = 0;
+	hideTimer();
+	startTimer(temptimer);
 }
 
 void mousecallback(ObjectID object, int x, int y, MouseAction action)
@@ -301,6 +311,16 @@ void mousecallback(ObjectID object, int x, int y, MouseAction action)
 	}
 }
 
+void timercallback(TimerID timer)
+{
+	if (timer == temptimer)
+	{
+		stopTimer(temptimer);
+		setTimer(temptimer, 1.0f);
+		startTimer(temptimer);
+		secondcount++;
+	}
+}
 int main(void)
 {
 	srand(time(NULL));
@@ -316,9 +336,10 @@ int main(void)
 	}
 
 	setMouseCallback(mousecallback);
+	setTimerCallback(timercallback);
 
-	locateObject(end, mainScene, 1000, 150); //종료버튼
-	locateObject(start, mainScene, 1000, 250); //시작버튼
+	locateObject(end, mainScene, 1000, 150); 
+	locateObject(start, mainScene, 1000, 250); 
 
 	puzzlelocate();
 
